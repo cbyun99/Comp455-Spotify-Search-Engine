@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Specifies the character encoding and viewport settings -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Catalog Search</title>
+
+    <!-- Custom width for sorting -->
+    <style>
+        .form-select.sort_width {
+            width: 190px; 
+        }
+    </style>
+    
+    
+    <!-- Bootstrap CSS for styling the page -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- JavaScript function to handle search functionality -->
+    <script>
+        async function search() {
+            // Get values from input fields
+            const query = document.getElementById('query').value;
+            const artist = document.getElementById('artist').value;
+            const year = document.getElementById('year').value;
+            const scale = document.getElementById('scale').value;
+            const streamsMin = document.getElementById('streams_min').value;
+            const streamsMax = document.getElementById('streams_max').value;
+            const sortBy = document.getElementById('sort_by').value;
+            const order = document.getElementById('order').value;
+
+            // Fetch data from server using query parameters
+            const response = await fetch(
+                `/search?query=${query}&artist=${artist}&year=${year}&scale=${scale}&streams_min=${streamsMin}&streams_max=${streamsMax}&sort_by=${sortBy}&order=${order}`
+            );
+            const data = await response.json(); // Parse the JSON response
+
+            // Display the results dynamically
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = `<p class="text-muted">Search completed in ${data.elapsed_time_ms.toFixed(2)} ms</p>`; // Display search duration
+            
+            // Loop through each result and create a card for it
+            data.results.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "p-3 border rounded mb-3"; // Add styling using Bootstrap classes
+                div.innerHTML = `
+                    <h5>${item.track_name} <small class="text-muted">by ${item['artist(s)_name']}</small></h5>
+                    <p>Year: ${item.released_year} | Key: ${item.key} ${item.mode} | Streams: ${parseInt(item.streams).toLocaleString()}</p>
+                `;
+                resultsContainer.appendChild(div); // Append each result to the container
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Main container for the search application -->
+    <div class="container mt-5">
+        <!-- Page header -->
+        <h1 class="text-center mb-4">🎵 Music Catalog Search 🎵</h1>
+        
+        <!-- Search input fields -->
+        <div class="row g-3">
+            <!-- Input for track or keyword search -->
+            <div class="col-md-3">
+                <input type="text" id="query" class="form-control" placeholder="Search tracks or keywords">
+            </div>
+            <!-- Input for artist name -->
+            <div class="col-md-3">
+                <input type="text" id="artist" class="form-control" placeholder="Artist name">
+            </div>
+            <!-- Input for released year -->
+            <div class="col-md-2">
+                <input type="text" id="year" class="form-control" placeholder="Released year">
+            </div>
+            <!-- Dropdown for selecting scale/key -->
+            <div class="col-md-2">
+                <select id="scale" class="form-select">
+                    <option value="">All Scales</option>
+                    <!-- Major scales -->
+                    <option value="A Major">A Major</option>
+                    <option value="As Major">A# Major</option>
+                    <option value="B Major">B Major</option>
+                    <option value="C Major">C Major</option>
+                    <option value="Cs Major">C# Major</option>
+                    <option value="D Major">D Major</option>
+                    <option value="Ds Major">D# Major</option>
+                    <option value="E Major">E Major</option>
+                    <option value="F Major">F Major</option>
+                    <option value="Fs Major">F# Major</option>
+                    <option value="G Major">G Major</option>
+                    <option value="Gs Major">G# Major</option>
+                    <!-- Minor scales -->
+                    <option value="A Minor">A Minor</option>
+                    <option value="As Minor">A# Minor</option>
+                    <option value="B Minor">B Minor</option>
+                    <option value="C Minor">C Minor</option>
+                    <option value="Cs Minor">C# Minor</option>
+                    <option value="D Minor">D Minor</option>
+                    <option value="Ds Minor">D# Minor</option>
+                    <option value="E Minor">E Minor</option>
+                    <option value="F Minor">F Minor</option>
+                    <option value="Fs Minor">F# Minor</option>
+                    <option value="G Minor">G Minor</option>
+                    <option value="Gs Minor">G# Minor</option>
+                </select>
+            </div>
+            <!-- Input for minimum streams -->
+            <div class="col-md-2">
+                <input type="number" id="streams_min" class="form-control" placeholder="Min Streams">
+            </div>
+            <!-- Input for maximum streams -->
+            <div class="col-md-2">
+                <input type="number" id="streams_max" class="form-control" placeholder="Max Streams">
+            </div>
+            <!-- Dropdown for sorting options -->
+            <div class="col-md-2">
+                <select id="sort_by" class="form-select sort_width">
+                    <option value="track_name">Sort by Track Name</option>
+                    <option value="released_year">Sort by Release Year</option>
+                    <option value="streams">Sort by Streams</option>
+                </select>
+            </div>
+            <!-- Dropdown for ascending or descending sorting -->
+            <div class="col-md-2">
+                <select id="order" class="form-select">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
+            
+            <!-- Search button -->
+            <div class="col-md-2">
+                <button onclick="search()" class="btn btn-primary w-100">Search</button>
+            </div>
+        </div>
+        
+        <!-- Horizontal divider -->
+        <hr>
+        
+        <!-- Container for displaying search results -->
+        <div id="results" class="mt-4"></div>
+    </div>
+    
+    <!-- Bootstrap JavaScript (optional for advanced Bootstrap features) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
